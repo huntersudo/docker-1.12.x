@@ -21,6 +21,7 @@ import (
 
 // CobraAdaptor is an adaptor for supporting spf13/cobra commands in the
 // docker/cli framework
+// TODO-SML: dockerCli 传给了每个子命令
 type CobraAdaptor struct {
 	rootCmd   *cobra.Command
 	dockerCli *client.DockerCli
@@ -122,8 +123,8 @@ func (c CobraAdaptor) run(cmd string, args []string) error {
 func (c CobraAdaptor) Command(name string) func(...string) error {
 	for _, cmd := range c.rootCmd.Commands() {
 		if cmd.Name() == name {
-			return func(args ...string) error {
-				return c.run(name, args)
+			return func(args ...string) error {   // TODO-SML： 这里是handler
+				return c.run(name, args)   // TODO-SML: 在命令名称前加上支持正常的命令委托， 闭包的使用？ 有点不好理解。
 			}
 		}
 	}

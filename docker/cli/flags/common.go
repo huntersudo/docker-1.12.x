@@ -36,6 +36,9 @@ type CommonFlags struct {
 	PostParse func()
 
 	Debug      bool
+	// TODO-SML : client 模式，需要连接的docker daemon 位置
+	// TODO-SML : daemon模式，需要监听的体制
+	// TODO-SML : 默认 unix:///var/run/docker.sock
 	Hosts      []string
 	LogLevel   string
 	TLS        bool

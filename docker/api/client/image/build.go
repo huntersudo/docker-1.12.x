@@ -58,6 +58,8 @@ type buildOptions struct {
 }
 
 // NewBuildCommand creates a new `docker build` command
+// TODO-SML: docker build --no-cache -t registry.paas/cmss/sfc/sfc-apirouting:ram  -f ./Dockerfile .
+//    docker build [OPTIONS] <PATH | URL | ->
 func NewBuildCommand(dockerCli *client.DockerCli) *cobra.Command {
 	ulimits := make(map[string]*units.Ulimit)
 	options := buildOptions{
@@ -72,7 +74,7 @@ func NewBuildCommand(dockerCli *client.DockerCli) *cobra.Command {
 		Short: "Build an image from a Dockerfile",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			options.context = args[0]
+			options.context = args[0]  // TODO-SML： .
 			return runBuild(dockerCli, options)
 		},
 	}
@@ -154,6 +156,7 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 
 	if buildCtx == nil {
 		// And canonicalize dockerfile name to a platform-independent one
+		// 并将dockerfile的名称规范化为一个与平台无关的名称
 		relDockerfile, err = archive.CanonicalTarNameForPath(relDockerfile)
 		if err != nil {
 			return fmt.Errorf("cannot canonicalize dockerfile path %s: %v", relDockerfile, err)
@@ -267,8 +270,9 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 		AuthConfigs:    dockerCli.RetrieveAuthConfigs(),
 		Labels:         runconfigopts.ConvertKVStringsToMap(options.labels.GetAll()),
 	}
-
+   // TODO-SML : 发起build 请求 ，注意里面有个好的实践： 自己封装的发起 client.do请求的代码片段，看看其他组件有无
 	response, err := dockerCli.Client().ImageBuild(ctx, body, buildOptions)
+
 	if err != nil {
 		return err
 	}

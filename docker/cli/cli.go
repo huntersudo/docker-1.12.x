@@ -31,6 +31,7 @@ type Initializer interface {
 }
 
 // New instantiates a ready-to-use Cli.
+// TODO-SML : 4个实现handler接口的都聚集了，Cli本身实现了，且持有了这4个（包括自己）
 func New(handlers ...Handler) *Cli {
 	// make the generic Cli object the first cli handler
 	// in order to handle `docker help` appropriately
@@ -60,7 +61,9 @@ func (cli *Cli) command(args ...string) (func(...string) error, error) {
 
 // Run executes the specified command.
 func (cli *Cli) Run(args ...string) error {
+	// TODO-SML : 从命令映射到对应的方法 ，cobraAdaptor中，使用遍历rootCmd.Commands的方法
 	if len(args) > 1 {
+	     // 多级命令
 		command, err := cli.command(args[:2]...)
 		if err == nil {
 			return command(args[2:]...)

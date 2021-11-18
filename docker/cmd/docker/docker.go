@@ -67,7 +67,7 @@ func main() {
 	}
 
 	clientCli := client.NewDockerCli(stdin, stdout, stderr, clientFlags)
-
+   // TODO-SML: 这三个都实现了handler接口
 	c := cli.New(clientCli, NewDaemonProxy(), cobraAdaptor)
 	if err := c.Run(flag.Args()...); err != nil {
 		if sterr, ok := err.(cli.StatusError); ok {
