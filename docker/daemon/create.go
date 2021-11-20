@@ -20,11 +20,13 @@ import (
 )
 
 // CreateManagedContainer creates a container that is managed by a Service
+//TODO-SML: for swarm
 func (daemon *Daemon) CreateManagedContainer(params types.ContainerCreateConfig) (types.ContainerCreateResponse, error) {
 	return daemon.containerCreate(params, true)
 }
 
 // ContainerCreate creates a regular container
+// TODO-SML : 普通创建容器
 func (daemon *Daemon) ContainerCreate(params types.ContainerCreateConfig) (types.ContainerCreateResponse, error) {
 	return daemon.containerCreate(params, false)
 }
@@ -61,6 +63,7 @@ func (daemon *Daemon) containerCreate(params types.ContainerCreateConfig, manage
 }
 
 // Create creates a new container from the given configuration with a given name.
+// TODO - container的一些参数 
 func (daemon *Daemon) create(params types.ContainerCreateConfig, managed bool) (retC *container.Container, retErr error) {
 	var (
 		container *container.Container

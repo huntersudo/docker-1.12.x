@@ -131,7 +131,7 @@ func (s *Server) makeHTTPHandler(handler httputils.APIFunc) http.HandlerFunc {
 		ctx := context.Background()
 		handlerFunc := s.handleWithGlobalMiddlewares(handler)
 
-		vars := mux.Vars(r)
+		vars := mux.Vars(r)  // TODO-SML vars的来源 ，如何解析 ,比如  /containers/{name:.*}/start
 		if vars == nil {
 			vars = make(map[string]string)
 		}
@@ -166,6 +166,7 @@ func (s *Server) createMux() *mux.Router {
 	logrus.Debug("Registering routers")
 	for _, apiRouter := range s.routers {
 		for _, r := range apiRouter.Routes() {
+			//TODO-SML:  将ApiFunc 转为 handler
 			f := s.makeHTTPHandler(r.Handler())
 
 			logrus.Debugf("Registering %s, %s", r.Method(), r.Path())

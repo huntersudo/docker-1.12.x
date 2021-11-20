@@ -38,6 +38,8 @@ type runOptions struct {
 }
 
 // NewRunCommand create a new `docker run` command
+// TODO-SML: docker run
+   // 先创建容器，再启动
 func NewRunCommand(dockerCli *client.DockerCli) *cobra.Command {
 	var opts runOptions
 	var copts *runconfigopts.ContainerOptions
@@ -147,7 +149,7 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 	}
 
 	ctx, cancelFun := context.WithCancel(context.Background())
-
+	// TODO-SML-1： daemon那边生成container的信息后，返回给client
 	createResponse, err := createContainer(ctx, dockerCli, config, hostConfig, networkingConfig, hostConfig.ContainerIDFile, opts.name)
 	if err != nil {
 		reportError(stderr, cmdPath, err.Error(), true)
@@ -203,7 +205,7 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 			Stderr:     config.AttachStderr,
 			DetachKeys: dockerCli.ConfigFile().DetachKeys,
 		}
-
+        //TODO-SML ? containerAttach
 		resp, errAttach := client.ContainerAttach(ctx, createResponse.ID, options)
 		if errAttach != nil && errAttach != httputil.ErrPersistEOF {
 			// ContainerAttach returns an ErrPersistEOF (connection closed)
@@ -231,7 +233,7 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 			}
 		}()
 	}
-
+    //TODO-SML-2: 启动容器
 	//start the container
 	if err := client.ContainerStart(ctx, createResponse.ID, types.ContainerStartOptions{}); err != nil {
 		// If we have holdHijackedConnection, we should notify

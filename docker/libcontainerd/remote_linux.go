@@ -104,6 +104,7 @@ func New(stateDir string, options ...RemoteOption) (_ Remote, err error) {
 	}
 
 	r.rpcConn = conn
+	//TODO-SML：创建 container的的 client
 	r.apiClient = containerd.NewAPIClient(conn)
 
 	// Get the timestamp to restore from

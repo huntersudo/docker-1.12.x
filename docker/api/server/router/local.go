@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// TODO-SML: 这套router设计体系
 // localRoute defines an individual API route to connect
 // with the docker daemon. It implements Route.
 type localRoute struct {
@@ -65,6 +66,7 @@ func NewHeadRoute(path string, handler httputils.APIFunc) Route {
 	return NewRoute("HEAD", path, handler)
 }
 
+// TODO-SML closure
 func cancellableHandler(h httputils.APIFunc) httputils.APIFunc {
 	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 		if notifier, ok := w.(http.CloseNotifier); ok {

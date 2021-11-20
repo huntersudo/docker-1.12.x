@@ -12,7 +12,7 @@ type validationError struct {
 func (validationError) IsValidationError() bool {
 	return true
 }
-
+// TODO-SML 这个router的使用方式可以在借鉴一下，试试效果，  https://github.com/gorilla/mux
 // containerRouter is a router to talk with the container controller
 type containerRouter struct {
 	backend Backend
@@ -52,14 +52,14 @@ func (r *containerRouter) initRoutes() {
 		router.NewGetRoute("/exec/{id:.*}/json", r.getExecByID),
 		router.NewGetRoute("/containers/{name:.*}/archive", r.getContainersArchive),
 		// POST
-		router.NewPostRoute("/containers/create", r.postContainersCreate),
 		// TODO-SML ：容器创建
+		router.NewPostRoute("/containers/create", r.postContainersCreate),
 		router.NewPostRoute("/containers/{name:.*}/kill", r.postContainersKill),
 		router.NewPostRoute("/containers/{name:.*}/pause", r.postContainersPause),
 		router.NewPostRoute("/containers/{name:.*}/unpause", r.postContainersUnpause),
 		router.NewPostRoute("/containers/{name:.*}/restart", r.postContainersRestart),
-		router.NewPostRoute("/containers/{name:.*}/start", r.postContainersStart),
 		// TODO-SML ：容器启动
+		router.NewPostRoute("/containers/{name:.*}/start", r.postContainersStart),
 		router.NewPostRoute("/containers/{name:.*}/stop", r.postContainersStop),
 		router.NewPostRoute("/containers/{name:.*}/wait", r.postContainersWait),
 		router.NewPostRoute("/containers/{name:.*}/resize", r.postContainersResize),

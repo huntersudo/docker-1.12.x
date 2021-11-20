@@ -124,6 +124,7 @@ func (s *containerRouter) getContainersExport(ctx context.Context, w http.Respon
 	return s.backend.ContainerExport(vars["name"], w)
 }
 
+// TODO-SML 这个handler很有意思，这个name就是url path中的 containerID [client发起]
 func (s *containerRouter) postContainersStart(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	// If contentLength is -1, we can assumed chunked encoding
 	// or more technically that the length is unknown
@@ -150,7 +151,7 @@ func (s *containerRouter) postContainersStart(ctx context.Context, w http.Respon
 		}
 		hostConfig = c
 	}
-
+	//
 	if err := s.backend.ContainerStart(vars["name"], hostConfig); err != nil {
 		return err
 	}
@@ -361,7 +362,7 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 	if err != nil {
 		return err
 	}
-
+  // TODO-SML: container的信息会作为Response返回给client, client紧接着会发送start命令
 	return httputils.WriteJSON(w, http.StatusCreated, ccr)
 }
 

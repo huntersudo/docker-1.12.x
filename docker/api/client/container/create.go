@@ -57,7 +57,7 @@ func NewCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	copts = runconfigopts.AddFlags(flags)
 	return cmd
 }
-
+// TODO-SML: docker client 向daemon发送 container create请求
 func runCreate(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *createOptions, copts *runconfigopts.ContainerOptions) error {
 	config, hostConfig, networkingConfig, err := runconfigopts.Parse(flags, copts)
 	if err != nil {
@@ -176,10 +176,9 @@ func createContainer(ctx context.Context, dockerCli *client.DockerCli, config *c
 			config.Image = trustedRef.String()
 		}
 	}
-
 	//create the container
 	response, err := dockerCli.Client().ContainerCreate(ctx, config, hostConfig, networkingConfig, name)
-
+    //如果daemon返回有误，则client端先拉取镜像，然后再去发请求给daemon
 	//if image not found try to pull it
 	if err != nil {
 		if apiclient.IsErrImageNotFound(err) && ref != nil {

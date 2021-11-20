@@ -11,6 +11,7 @@ import (
 )
 
 // StateChanged updates daemon state changes from containerd
+// TODO-SML container start
 func (daemon *Daemon) StateChanged(id string, e libcontainerd.StateInfo) error {
 	c := daemon.containers.Get(id)
 	if c == nil {
@@ -74,6 +75,7 @@ func (daemon *Daemon) StateChanged(id string, e libcontainerd.StateInfo) error {
 		} else {
 			logrus.Warnf("Ignoring StateExitProcess for %v but no exec command found", e)
 		}
+		//TODO-SML container start
 	case libcontainerd.StateStart, libcontainerd.StateRestore:
 		// Container is already locked in this case
 		c.SetRunning(int(e.Pid), e.State == libcontainerd.StateStart)
@@ -82,6 +84,7 @@ func (daemon *Daemon) StateChanged(id string, e libcontainerd.StateInfo) error {
 			c.Reset(false)
 			return err
 		}
+		//TODO-SML container start
 		daemon.initHealthMonitor(c)
 		daemon.LogContainerEvent(c, "start")
 	case libcontainerd.StatePause:

@@ -88,7 +88,7 @@ func (ctr *container) spec() (*specs.Spec, error) {
 	}
 	return &spec, nil
 }
-
+//TODO-SML container start
 func (ctr *container) start(attachStdio StdioCallback) error {
 	spec, err := ctr.spec()
 	if err != nil {
@@ -131,6 +131,7 @@ func (ctr *container) start(attachStdio StdioCallback) error {
 		return err
 	})
 
+	// TODO-SML； GRPC
 	r := &containerd.CreateContainerRequest{
 		Id:         ctr.containerID,
 		BundlePath: ctr.dir,
@@ -149,6 +150,7 @@ func (ctr *container) start(attachStdio StdioCallback) error {
 		return err
 	}
 
+	// TODO-SML  grpc 方式去调用containerd
 	resp, err := ctr.client.remote.apiClient.CreateContainer(context.Background(), r)
 	if err != nil {
 		ctr.closeFifos(iopipe)
@@ -157,7 +159,7 @@ func (ctr *container) start(attachStdio StdioCallback) error {
 	ctr.startedAt = time.Now()
 	ctr.systemPid = systemPid(resp.Container)
 	close(ready)
-
+	//TODO-SML container start
 	return ctr.client.backend.StateChanged(ctr.containerID, StateInfo{
 		CommonStateInfo: CommonStateInfo{
 			State: StateStart,

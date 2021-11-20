@@ -89,6 +89,7 @@ func (daemon *Daemon) Start(container *container.Container) error {
 // container needs, such as storage and networking, as well as links
 // between containers. The container is left waiting for a signal to
 // begin running.
+// TODO-SML : daemon.containerStart
 func (daemon *Daemon) containerStart(container *container.Container) (err error) {
 	container.Lock()
 	defer container.Unlock()
@@ -140,7 +141,10 @@ func (daemon *Daemon) containerStart(container *container.Container) (err error)
 	if copts != nil {
 		createOptions = append(createOptions, *copts...)
 	}
-
+  // TODO-SML : libcontainerd 开始
+  //    先到 libcontainerd/client_linux.go#Create
+  //    先到 libcontainerd/container_linux.go#Start
+  //    先到 daemon/monitor.go#StateChange
 	if err := daemon.containerd.Create(container.ID, *spec, container.InitializeStdio, createOptions...); err != nil {
 		errDesc := grpc.ErrorDesc(err)
 		logrus.Errorf("Create container failed with error: %s", errDesc)

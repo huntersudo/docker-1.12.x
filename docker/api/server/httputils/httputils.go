@@ -20,10 +20,12 @@ const UAStringKey = "upstream-user-agent"
 
 // APIFunc is an adapter to allow the use of ordinary functions as Docker API endpoints.
 // Any function that has the appropriate signature can be registered as an API endpoint (e.g. getVersion).
+//TODO-SML 设计思路： 任何有类似接口的函数都可以注册为 api 接口
 type APIFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error
 
 // HijackConnection interrupts the http response writer to get the
 // underlying connection and operate with it.
+// TODO-SML  劫持Con ,结合client 、daemon端一起看
 func HijackConnection(w http.ResponseWriter) (io.ReadCloser, io.Writer, error) {
 	conn, _, err := w.(http.Hijacker).Hijack()
 	if err != nil {

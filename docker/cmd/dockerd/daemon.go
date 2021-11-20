@@ -262,6 +262,7 @@ func (cli *DaemonCli) start() (err error) {
 	cli.TrustKeyPath = cli.commonFlags.TrustKey
 
 	registryService := registry.NewService(cli.Config.ServiceOptions)
+	//TODO-SML 创建containerd的 grpc client
 	containerdRemote, err := libcontainerd.New(cli.getLibcontainerdRoot(), cli.getPlatformRemoteOptions()...)
 	if err != nil {
 		return err
