@@ -58,9 +58,9 @@ func (s *Server) Accept(addr string, listeners ...net.Listener) {
 	for _, listener := range listeners {
 		httpServer := &HTTPServer{
 			srv: &http.Server{
-				Addr: addr,
+				Addr: addr, // /var/run/docker.sock
 			},
-			l: listener,
+			l: listener,  // l, err := net.Listen("unix", path)
 		}
 		s.servers = append(s.servers, httpServer)
 	}

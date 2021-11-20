@@ -65,6 +65,7 @@ func main() {
 	}
 
 	if !stop {
+		// TODO-SML: apiserver、daemon等
 		err = daemonCli.start()
 		notifyShutdown(err)
 		if err != nil {

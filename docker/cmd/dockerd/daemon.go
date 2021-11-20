@@ -125,6 +125,15 @@ func migrateKey() (err error) {
 	return nil
 }
 
+// TODO-SML:
+// [root@master ~]# ps -ef|grep dockerd
+//root     337255 336903  0 00:16 pts/1    00:00:00 grep --color=auto dockerd
+//root     469200      1  1 9月23 ?       14:23:39 /usr/bin/dockerd --insecure-registry=0.0.0.0/0
+//--data-root=/apps/data/docker --log-opt max-size=50m --log-opt max-file=5 --live-restore=true
+//--pidfile=/apps/run/docker/docker.pid --iptables=true -s overlay2
+//--dns-search default.svc.cluster.local --dns-search svc.cluster.local --dns-opt ndots:2 --dns-opt timeout:2
+//--dns-opt attempts:2
+
 func (cli *DaemonCli) start() (err error) {
 	stopc := make(chan bool)
 	defer close(stopc)
@@ -217,15 +226,15 @@ func (cli *DaemonCli) start() (err error) {
 		if cli.Config.Hosts[i], err = opts.ParseHost(cli.Config.TLS, cli.Config.Hosts[i]); err != nil {
 			return fmt.Errorf("error parsing -H %s : %v", cli.Config.Hosts[i], err)
 		}
-
+        // "unix:///var/run/docker.sock"
 		protoAddr := cli.Config.Hosts[i]
 		protoAddrParts := strings.SplitN(protoAddr, "://", 2)
 		if len(protoAddrParts) != 2 {
 			return fmt.Errorf("bad format %s, expected PROTO://ADDR", protoAddr)
 		}
 
-		proto := protoAddrParts[0]
-		addr := protoAddrParts[1]
+		proto := protoAddrParts[0]  // unix
+		addr := protoAddrParts[1]   // /var/run/docker.sock
 
 		// It's a bad idea to bind to TCP without tlsverify.
 		if proto == "tcp" && (serverConfig.TLSConfig == nil || serverConfig.TLSConfig.ClientAuth != tls.RequireAndVerifyClientCert) {
@@ -243,6 +252,7 @@ func (cli *DaemonCli) start() (err error) {
 			}
 		}
 		logrus.Debugf("Listener created for HTTP on %s (%s)", protoAddrParts[0], protoAddrParts[1])
+		// TODO-SML: listener ->  HttpServer
 		api.Accept(protoAddrParts[1], ls...)
 	}
 
@@ -261,14 +271,15 @@ func (cli *DaemonCli) start() (err error) {
 		cli.stop()
 		<-stopc // wait for daemonCli.start() to return
 	})
-
+// TODO-SML 上面是apiserver
+// TODO-SML 创建一个Daemon对象来处理用户请求
 	d, err := daemon.NewDaemon(cli.Config, registryService, containerdRemote)
 	if err != nil {
 		return fmt.Errorf("Error starting daemon: %v", err)
 	}
 
 	name, _ := os.Hostname()
-
+   //TODO:  swarm cluster
 	c, err := cluster.New(cluster.Config{
 		Root:                   cli.Config.Root,
 		Name:                   name,
@@ -289,6 +300,7 @@ func (cli *DaemonCli) start() (err error) {
 	}).Info("Docker daemon")
 
 	cli.initMiddlewares(api, serverConfig)
+	// TODO-SML: dockerd routers
 	initRouter(api, d, c)
 
 	cli.d = d
@@ -298,6 +310,7 @@ func (cli *DaemonCli) start() (err error) {
 	// We need to start it as a goroutine and wait on it so
 	// daemon doesn't exit
 	serveAPIWait := make(chan error)
+	// TODO-SML: goroutine方式启动 ApiServer
 	go api.Wait(serveAPIWait)
 
 	// after the daemon is done setting up we can notify systemd api
@@ -307,7 +320,7 @@ func (cli *DaemonCli) start() (err error) {
 	// Wait for serve API to complete
 	errAPI := <-serveAPIWait
 	c.Cleanup()
-	shutdownDaemon(d, 15)
+	shutdownDaemon(d, 15)  // TODO-SML 关闭daemon
 	containerdRemote.Cleanup()
 	if errAPI != nil {
 		return fmt.Errorf("Shutting down due to ServeAPI error: %v", errAPI)

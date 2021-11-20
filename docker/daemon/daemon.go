@@ -391,11 +391,13 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	}
 
 	// Ensure we have compatible and valid configuration options
+	//TODO-SML 检查容器配置信息
 	if err := verifyDaemonSettings(config); err != nil {
 		return nil, err
 	}
 
 	// Do we have a disabled network?
+	//TODO-SML 网桥配置信息
 	config.DisableBridge = isBridgeNetworkDisabled(config)
 
 	// Verify the platform is supported as a daemon
@@ -404,6 +406,7 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	}
 
 	// Validate platform-specific requirements
+	//TODO-SML root，及kernel
 	if err := checkSystem(); err != nil {
 		return nil, err
 	}
@@ -422,6 +425,8 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	}
 
 	// get the canonical path to the Docker root directory
+	//TODO-SML 配置所需的文件环境
+	//TODO-SML ROOT: defaultGraph    = "/var/lib/docker"  || V18.09 是这配置 --data-root=/apps/data/docker
 	var realRoot string
 	if _, err := os.Stat(config.Root); err != nil && os.IsNotExist(err) {
 		realRoot = config.Root
@@ -481,7 +486,7 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 
 	driverName := os.Getenv("DOCKER_DRIVER")
 	if driverName == "" {
-		driverName = config.GraphDriver
+		driverName = config.GraphDriver  //TODO-SML:  -s overlay2
 	}
 	d.layerStore, err = layer.NewStoreFromOptions(layer.StoreOptions{
 		StorePath:                 config.Root,
@@ -496,6 +501,7 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	}
 
 	graphDriver := d.layerStore.DriverName()
+	// TODO-SML: 结果：  /apps/data/docker/image/overlay2 docker V18.09
 	imageRoot := filepath.Join(config.Root, "image", graphDriver)
 
 	// Configure and validate the kernels security support
@@ -507,7 +513,7 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	d.downloadManager = xfer.NewLayerDownloadManager(d.layerStore, *config.MaxConcurrentDownloads)
 	logrus.Debugf("Max Concurrent Uploads: %d", *config.MaxConcurrentUploads)
 	d.uploadManager = xfer.NewLayerUploadManager(*config.MaxConcurrentUploads)
-
+    // TODO-SML : /apps/data/docker/image
 	ifs, err := image.NewFSStoreBackend(filepath.Join(imageRoot, "imagedb"))
 	if err != nil {
 		return nil, err
@@ -528,20 +534,20 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	if err != nil {
 		return nil, err
 	}
-
+	// TODO-SML : /apps/data/docker/trust
 	trustDir := filepath.Join(config.Root, "trust")
 
 	if err := system.MkdirAll(trustDir, 0700); err != nil {
 		return nil, err
 	}
-
+	// TODO-SML : /apps/data/docker/image/overlay2/distribution
 	distributionMetadataStore, err := dmetadata.NewFSMetadataStore(filepath.Join(imageRoot, "distribution"))
 	if err != nil {
 		return nil, err
 	}
 
 	eventsService := events.New()
-
+	// TODO-SML : /apps/data/docker/image
 	referenceStore, err := reference.NewReferenceStore(filepath.Join(imageRoot, "repositories.json"))
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create Tag store repositories: %s", err)
@@ -569,7 +575,7 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	if runtime.GOOS == "linux" && !sysInfo.CgroupDevicesEnabled {
 		return nil, fmt.Errorf("Devices cgroup isn't mounted")
 	}
-
+   // TODO-SML 所有属性信息
 	d.ID = trustKey.PublicKey().KeyID()
 	d.repository = daemonRepo
 	d.containers = container.NewMemoryStore()
@@ -596,7 +602,7 @@ func NewDaemon(config *Config, registryService registry.Service, containerdRemot
 	d.containerdRemote = containerdRemote
 
 	go d.execCommandGC()
-
+     // TODO-SML: libcontainerd
 	d.containerd, err = containerdRemote.Client(d)
 	if err != nil {
 		return nil, err
