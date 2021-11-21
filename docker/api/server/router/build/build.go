@@ -23,6 +23,8 @@ func (r *buildRouter) Routes() []router.Route {
 }
 
 func (r *buildRouter) initRoutes() {
+	//TODO-SML :docker build 在 /docker/builder中
+	//TODO-SML :docker image 在 /docker/daemon/image中
 	r.routes = []router.Route{
 		router.Cancellable(router.NewPostRoute("/build", r.postBuild)),
 	}

@@ -131,6 +131,7 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 		buildBuff = bytes.NewBuffer(nil)
 	}
 
+	// TODO-SML 根绝第一个参数，判断为4种build情况
 	switch {
 	case specifiedContext == "-":
 		buildCtx, relDockerfile, err = builder.GetContextFromReader(dockerCli.In(), options.dockerfileName)

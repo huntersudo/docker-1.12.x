@@ -83,7 +83,7 @@ func (b *Builder) commit(id string, autoCmd strslice.StrSlice, comment string) e
 		return err
 	}
 
-	b.image = imageID
+	b.image = imageID  // TODO-SML： 每个指令commit生成新的镜像，都会更新这个imageId
 	return nil
 }
 
@@ -181,6 +181,7 @@ func (b *Builder) runContextCommand(args []string, allowRemote bool, allowLocalD
 		return nil
 	}
 
+	//TODO-SML ： 为每个指令创建一个临时容器，在这个临时容器中执行命令，然后commit使用此容器生成一个镜像层
 	container, err := b.docker.ContainerCreate(types.ContainerCreateConfig{Config: b.runConfig})
 	if err != nil {
 		return err
@@ -200,7 +201,7 @@ func (b *Builder) runContextCommand(args []string, allowRemote bool, allowLocalD
 			return err
 		}
 	}
-
+    //TODO-SML: 然后commit使用此容器生成一个镜像层
 	return b.commit(container.ID, cmd, comment)
 }
 

@@ -64,7 +64,7 @@ type Builder struct {
 	runConfig        *container.Config // runconfig for cmd, run, entrypoint etc.
 	flags            *BFlags
 	tmpContainers    map[string]struct{}
-	image            string // imageID
+	image            string // imageID   // TODO-SML： 每个指令commit生成新的镜像，都会更新这个imageId
 	noBaseImage      bool
 	maintainer       string
 	cmdSet           bool
@@ -220,6 +220,7 @@ func (b *Builder) build(stdout io.Writer, stderr io.Writer, out io.Writer) (stri
 		return "", err
 	}
 
+	//TODO-SML解析遍历所有指令，后续使用dispatch
 	if len(b.options.Labels) > 0 {
 		line := "LABEL "
 		for k, v := range b.options.Labels {
@@ -242,6 +243,7 @@ func (b *Builder) build(stdout io.Writer, stderr io.Writer, out io.Writer) (stri
 		default:
 			// Not cancelled yet, keep going...
 		}
+		//TODO-SML:  映射到不同的Parser上去处理
 		if err := b.dispatch(i, n); err != nil {
 			if b.options.ForceRemove {
 				b.clearTmp()

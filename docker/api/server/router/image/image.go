@@ -33,6 +33,7 @@ func (r *imageRouter) initRoutes() {
 		// GET
 		router.NewGetRoute("/images/json", r.getImagesJSON),
 		router.NewGetRoute("/images/search", r.getImagesSearch),
+		// docker save
 		router.NewGetRoute("/images/get", r.getImagesGet),
 		router.NewGetRoute("/images/{name:.*}/get", r.getImagesGet),
 		router.NewGetRoute("/images/{name:.*}/history", r.getImagesHistory),
@@ -40,7 +41,9 @@ func (r *imageRouter) initRoutes() {
 		// POST
 		router.NewPostRoute("/commit", r.postCommit),
 		router.NewPostRoute("/images/load", r.postImagesLoad),
+		// TODO-SML : docker pull images
 		router.Cancellable(router.NewPostRoute("/images/create", r.postImagesCreate)),
+		// docker push
 		router.Cancellable(router.NewPostRoute("/images/{name:.*}/push", r.postImagesPush)),
 		router.NewPostRoute("/images/{name:.*}/tag", r.postImagesTag),
 		// DELETE
