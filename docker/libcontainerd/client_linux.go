@@ -147,7 +147,14 @@ func (clnt *client) prepareBundleDir(uid, gid int) (string, error) {
 	}
 	return p, nil
 }
-//TODO-SML container start
+
+// Create [3.4.1 libcontainer[runC]的工作方式]
+//TODO-SML: 这里是libcontainer拿到dameon提交的信息|| container start
+//    daemon 调用 libcontainer[runC] 创建Process对象
+//    设置容器的输出管道pipes ：参数attachStdio，来源daemon.containerd.Create 中的  container.InitializeStdio
+//    创建一个逻辑上的容器，容器配置填充到container中，
+//    启动物理容器： grpc方式调用containerd,然后  daemon/monitor.go#StateChange，算是一个回调
+// libcontainer对Docker容器做了抽象，定义了Process和Container来对应 Linux中 进程和容器的关系
 func (clnt *client) Create(containerID string, spec Spec, attachStdio StdioCallback, options ...CreateOption) (err error) {
 	clnt.lock(containerID)
 	defer clnt.unlock(containerID)
@@ -170,6 +177,7 @@ func (clnt *client) Create(containerID string, spec Spec, attachStdio StdioCallb
 		return err
 	}
 
+	// TODO-SML 创建一个逻辑上的容器(包含Process对象)，容器配置填充到container中，
 	container := clnt.newContainer(filepath.Join(dir, containerID), options...)
 	if err := container.clean(); err != nil {
 		return err
@@ -196,6 +204,7 @@ func (clnt *client) Create(containerID string, spec Spec, attachStdio StdioCallb
 		return err
 	}
 
+	// TODO-SML:  使用逻辑容器  启动  物理容器
 	return container.start(attachStdio)
 }
 

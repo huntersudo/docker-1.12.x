@@ -30,6 +30,7 @@ type Container struct {
 	CommonContainer
 
 	// Fields below here are platform specific.
+	// TODO-SML : 下面这些字段是plat特定的
 	AppArmorProfile string
 	HostnamePath    string
 	HostsPath       string

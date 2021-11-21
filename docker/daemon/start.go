@@ -141,10 +141,11 @@ func (daemon *Daemon) containerStart(container *container.Container) (err error)
 	if copts != nil {
 		createOptions = append(createOptions, *copts...)
 	}
-  // TODO-SML : libcontainerd 开始
+  // TODO-SML : 这里是daemon 提交到 libcontainerd
   //    先到 libcontainerd/client_linux.go#Create
   //    先到 libcontainerd/container_linux.go#Start
   //    先到 daemon/monitor.go#StateChange
+  //  提交三大参数： 管道描述符、、容器配置、回调函数【应该是改为  daemon/monitor.go#StateChange，算是一个回调 】
 	if err := daemon.containerd.Create(container.ID, *spec, container.InitializeStdio, createOptions...); err != nil {
 		errDesc := grpc.ErrorDesc(err)
 		logrus.Errorf("Create container failed with error: %s", errDesc)

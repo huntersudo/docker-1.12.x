@@ -88,7 +88,10 @@ func (ctr *container) spec() (*specs.Spec, error) {
 	}
 	return &spec, nil
 }
-//TODO-SML container start
+//TODO-SML 使用逻辑容器  启动  物理容器
+//   参与物理容器创建过程的Process一共有2个实例：
+//    Process:用于物理容内进程的配置和IO管理
+//    ParentProcess: 负责从物理容器外部处理物理容器启动工作,与Container对象直接交互，启动工作完成后，
 func (ctr *container) start(attachStdio StdioCallback) error {
 	spec, err := ctr.spec()
 	if err != nil {
@@ -98,7 +101,7 @@ func (ctr *container) start(attachStdio StdioCallback) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ready := make(chan struct{})
-
+   // TODO-SML: 创建一个管道pipe，用来与容器内未来要运行的进程通信
 	iopipe, err := ctr.openFifos(spec.Process.Terminal)
 	if err != nil {
 		return err
@@ -145,7 +148,7 @@ func (ctr *container) start(attachStdio StdioCallback) error {
 	}
 	ctr.client.appendContainer(ctr)
 
-	if err := attachStdio(*iopipe); err != nil {
+	if err := attachStdio(*iopipe); err != nil {  //TODO-SML: attachStdio 是daemon传过来的输出列pipes
 		ctr.closeFifos(iopipe)
 		return err
 	}

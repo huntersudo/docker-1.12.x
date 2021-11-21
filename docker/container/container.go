@@ -59,11 +59,12 @@ func (DetachError) Error() string {
 
 // CommonContainer holds the fields for a container which are
 // applicable across all platforms supported by the daemon.
+// TODO-SML: 这里包含了各个plat通用的配置信息
 type CommonContainer struct {
 	StreamConfig *stream.Config
 	// embed for Container to support states directly.
 	*State          `json:"State"` // Needed for remote api version <= 1.11
-	Root            string         `json:"-"` // Path to the "home" of the container, including metadata.
+	Root            string         `json:"-"` // Path to the "home" of the container, including metadata. // TODO-SML: rootFs
 	BaseFS          string         `json:"-"` // Path to the graphdriver mountpoint
 	RWLayer         layer.RWLayer  `json:"-"`
 	ID              string
@@ -71,9 +72,9 @@ type CommonContainer struct {
 	Managed         bool
 	Path            string
 	Args            []string
-	Config          *containertypes.Config
+	Config          *containertypes.Config  // TODO-SML: 容器中未来要运行的进程信息
 	ImageID         image.ID `json:"Image"`
-	NetworkSettings *network.Settings
+	NetworkSettings *network.Settings  // TODO-SML: network相关
 	LogPath         string
 	Name            string
 	Driver          string
@@ -84,6 +85,7 @@ type CommonContainer struct {
 	HasBeenStartedBefore   bool
 	HasBeenManuallyStopped bool // used for unless-stopped restart policy
 	MountPoints            map[string]*volume.MountPoint
+	// TODO-SML: NS 相关: 包括 Cgroup
 	HostConfig             *containertypes.HostConfig `json:"-"` // do not serialize the host config in the json, otherwise we'll make the container unportable
 	ExecCommands           *exec.Store                `json:"-"`
 	// logDriver for closing

@@ -15,6 +15,7 @@ const (
 )
 
 type containerCommon struct {
+	// TODO-SML: 创建Process对象
 	process
 	restartManager restartmanager.RestartManager
 	restarting     bool
